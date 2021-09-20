@@ -8,9 +8,12 @@ export class Ticket {
     end: boolean = false;
     process: ChildProcess | null = null;
     async wait() {
-        let count = TIMEOUT_SEC * (1 / SLEEP_INTERVAL);
-        while (!this.end && count-- > 0)
-            await sleep(0.5);
+        let timeoutFlag = false;
+        const start = new Date().getTime();
+        while (!this.end && !timeoutFlag) {
+            await sleep(SLEEP_INTERVAL);
+            timeoutFlag = new Date().getTime() - start > TIMEOUT_SEC * 1000;
+        }
     }
 }
 
@@ -27,6 +30,6 @@ export function execSh(exeName: string, args: string[] = []): Ticket {
             console.log(stdout);
         tic.end = true;
     };
-    tic.process = exec(SH_DIR + exeName + ".sh " + args.join(" "), { }, cb);
+    tic.process = exec(SH_DIR + exeName + ".sh " + args.join(" "), {}, cb);
     return tic;
 }
