@@ -7,6 +7,8 @@ export class BbtContext {
     public readonly rootPath: string;
     public readonly workPath: string;
     public readonly assetPath: string;
+    public readonly envPath: string;
+
     public readonly def: BbtDef;
 
     constructor(defArg: string) {
@@ -16,6 +18,7 @@ export class BbtContext {
         this.workPath = __dirname + "/work/"
         this.def = JSON.parse(fs.readFileSync(defPath, 'utf-8')) as BbtDef;
         this.assetPath = this.rootPath + this.def.asset;
+        this.envPath = this.workPath + "/env/";
 
         if (!isBbtDef(this.def))
             throw Error("The bbt definition's format is invalid.");
