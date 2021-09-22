@@ -1,7 +1,9 @@
 import * as fs from "fs";
 import * as path from "path";
 import { BbtDef, isBbtDef, CmdDef, Check } from "./def";
+import { BbtContext } from "./context";
 import { execSh } from "./sh_executor";
+import { AssertionType } from "./const";
 
 function owata_(promise: Promise<any>) {
     return promise.catch(e => {
@@ -19,22 +21,55 @@ function owata_(promise: Promise<any>) {
 
 async function main() {
 
-    const defPath = process.argv[2] ? process.argv[2] : path.resolve(".") + "/bbtdef.json";
-    const rootPath = path.dirname(defPath);
-    const def = JSON.parse(fs.readFileSync(defPath, 'utf-8')) as BbtDef;
-    if (!isBbtDef(def))
-        throw Error("The bbt definition's format is invalid.");
+    const context = new BbtContext(process.argv[2]);
+    validate(context);
 
-    // 0 - bbtdef.json/needの資産をworkにcopy
-    // TODO これだけならfsのcopyFileでいい
-    await execSh("setup", def.need).wait();
+    fs.mkdirSync(context.workPath);
+    context.def.need.forEach(n => {
+        const need = context.rootPath + n;
+        fs.copyFileSync(need, context.workPath, fs.constants.COPYFILE_FICLONE_FORCE);
+    });
+
+    await execSh("setup", context.def.need).wait();
 
     // --- 以下をテストケース毎に/マルチプロセスで並列に捌きたい
+    context.def.operations.forEach(() => { });
     // 1 - inputディレクトリをworkにcopy
     // 2 - workにcdしてコマンドをそのまま叩く
     // 3 - outputディレクトリを用いて期待値を突合する
 
-    console.log(def.operations[0].command);
+
+
+
+    fs.rmSync(context.workPath, { force: true, recursive: true });
+}
+
+function validate(context: BbtContext) {
+
+    const nameSet = new Set(context.def.operations.map(o => o.name));
+    if (nameSet.size != context.def.operations.length)
+        throw Error("The operation's name must not be duplicated.");
+
+    context.def.operations.forEach(o => validatePerOpe(o, context.assetPath));
+}
+
+function validatePerOpe(def: CmdDef, assetPath: string) {
+    def.expected.forEach(c => {
+
+        if (!AssertionType.values().includes(c.act))
+            throw Error("Invalid act type is found. The operation's name is [" + def.name + "].");
+        
+        if (c.act == AssertionType.FILE_OUTPUT
+            && !fs.existsSync(assetPath + "/output/" + c.value))
+            throw Error("Asset file lacks. The operation's name is [" + def.name + "].");
+        if (c.act == AssertionType.FILE_UPDATE
+            && (!fs.existsSync(assetPath + "/input/" + c.value)
+            || !fs.existsSync(assetPath + "/output/" + c.value)))
+            throw Error("Asset file lacks. The operation's name is [" + def.name + "].");
+        if (c.act == AssertionType.FILE_DELETE
+            && !fs.existsSync(assetPath + "/input/" + c.value))
+            throw Error("Asset file lacks. The operation's name is [" + def.name + "].");
+    });
 }
 
 owata_(main());
