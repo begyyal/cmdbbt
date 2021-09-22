@@ -5,12 +5,10 @@ export class AssertionType {
     public static readonly FILE_UPDATE = "file-update";
     public static readonly FILE_DELETE = "file-delete";
 
-    public static values(): string[] {
-        return [
-            this.CONSOLE_OUTPUT,
-            this.FILE_OUTPUT,
-            this.FILE_UPDATE,
-            this.FILE_DELETE
-        ];
-    }
+    public static readonly values = [
+        AssertionType.CONSOLE_OUTPUT,
+        AssertionType.FILE_OUTPUT,
+        AssertionType.FILE_UPDATE,
+        AssertionType.FILE_DELETE
+    ];
 }

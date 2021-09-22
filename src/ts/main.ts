@@ -56,7 +56,7 @@ function validate(context: BbtContext) {
 function validatePerOpe(def: CmdDef, assetPath: string) {
     def.expected.forEach(c => {
 
-        if (!AssertionType.values().includes(c.act))
+        if (!AssertionType.values.includes(c.act))
             throw Error("Invalid act type is found. The operation's name is [" + def.name + "].");
         
         if (c.act == AssertionType.FILE_OUTPUT
