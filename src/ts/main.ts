@@ -48,25 +48,25 @@ function validate(context: BbtContext): void {
     if (nameSet.size != context.def.operations.length)
         throw Error("The operation's name must not be duplicated.");
 
-    context.def.operations.forEach(o => validatePerOpe(o, context.assetPath));
+    context.def.operations.forEach(o => validatePerOpe(o, context.resourcePath));
 }
 
-function validatePerOpe(def: CmdDef, assetPath: string): void {
+function validatePerOpe(def: CmdDef, resourcePath: string): void {
     def.expected.forEach(c => {
 
         if (!AssertionType.values.includes(c.act))
             throw Error("Invalid act type is found. The operation's name is [" + def.name + "].");
 
         if (c.act == AssertionType.FILE_OUTPUT
-            && !fs.existsSync(assetPath + "/output/" + c.value))
-            throw Error("Asset file lacks. The operation's name is [" + def.name + "].");
+            && !fs.existsSync(resourcePath + "/output/" + c.value))
+            throw Error("Resource files lack. The operation's name is [" + def.name + "].");
         if (c.act == AssertionType.FILE_UPDATE
-            && (!fs.existsSync(assetPath + "/input/" + c.value)
-                || !fs.existsSync(assetPath + "/output/" + c.value)))
-            throw Error("Asset file lacks. The operation's name is [" + def.name + "].");
+            && (!fs.existsSync(resourcePath + "/input/" + c.value)
+                || !fs.existsSync(resourcePath + "/output/" + c.value)))
+            throw Error("Resource files lack. The operation's name is [" + def.name + "].");
         if (c.act == AssertionType.FILE_DELETE
-            && !fs.existsSync(assetPath + "/input/" + c.value))
-            throw Error("Asset file lacks. The operation's name is [" + def.name + "].");
+            && !fs.existsSync(resourcePath + "/input/" + c.value))
+            throw Error("Resource files lack. The operation's name is [" + def.name + "].");
     });
 }
 

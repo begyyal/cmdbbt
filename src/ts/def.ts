@@ -1,12 +1,12 @@
 export interface BbtDef {
     need: string[];
-    asset: string;
+    resource: string;
     operations: CmdDef[];
 }
 
 export function isBbtDef(def: any): def is BbtDef {
     let ok = def.need !== undefined &&
-        def.asset !== undefined &&
+        def.resource !== undefined &&
         def.operations !== undefined;
     if (ok) {
         let ope = def.operations;

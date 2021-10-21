@@ -6,7 +6,7 @@ export class BbtContext {
 
     public readonly rootPath: string;
     public readonly workPath: string;
-    public readonly assetPath: string;
+    public readonly resourcePath: string;
     public readonly envPath: string;
 
     public readonly def: BbtDef;
@@ -17,7 +17,7 @@ export class BbtContext {
         this.rootPath = path.dirname(defPath);
         this.workPath = __dirname + "/work/"
         this.def = JSON.parse(fs.readFileSync(defPath, 'utf-8')) as BbtDef;
-        this.assetPath = this.rootPath + this.def.asset;
+        this.resourcePath = this.rootPath + this.def.resource;
         this.envPath = this.workPath + "/env/";
 
         if (!isBbtDef(this.def))
