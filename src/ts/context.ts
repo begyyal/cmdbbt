@@ -4,6 +4,7 @@ import { BbtDef, isBbtDef, CmdDef, Check } from "./def";
 
 export class BbtContext {
 
+    public readonly defPath: string;
     public readonly rootPath: string;
     public readonly workPath: string;
     public readonly resourcePath: string;
@@ -13,10 +14,10 @@ export class BbtContext {
 
     constructor(defArg: string) {
 
-        const defPath = defArg ? defArg : path.resolve(".") + "/bbtdef.json";
-        this.rootPath = path.dirname(defPath);
-        this.workPath = __dirname + "/work/"
-        this.def = JSON.parse(fs.readFileSync(defPath, 'utf-8')) as BbtDef;
+        this.defPath = defArg ? defArg : path.resolve(".") + "/bbtdef.json";
+        this.rootPath = path.dirname(this.defPath);
+        this.workPath = __dirname + "/../work/"
+        this.def = JSON.parse(fs.readFileSync(this.defPath, 'utf-8')) as BbtDef;
         this.resourcePath = this.rootPath + this.def.resource;
         this.envPath = this.workPath + "/env/";
 

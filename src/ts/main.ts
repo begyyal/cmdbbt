@@ -5,6 +5,8 @@ import { BbtContext } from "./context";
 import { execSh } from "./sh_executor";
 import { AssertionType } from "./const";
 
+let workPath: string;
+
 function owata_(promise: Promise<any>) {
     return promise.catch(e => {
 
@@ -15,6 +17,8 @@ function owata_(promise: Promise<any>) {
             console.error("exit code -> " + e.code);
         console.error(e instanceof Error ? e.message : e);
 
+        if (workPath)
+            fs.rmSync(workPath, { force: true, recursive: true });
         process.exit(-1);
     });
 }
@@ -22,24 +26,40 @@ function owata_(promise: Promise<any>) {
 async function main() {
 
     const context = new BbtContext(process.argv[2]);
+    workPath = context.workPath;
 
-    fs.mkdirSync(context.workPath);
+    if (fs.existsSync(workPath))
+        throw Error("May be working other process just now.");
+    fs.mkdirSync(workPath);
 
     validate(context);
     constructEnv(context);
 
-    // await execSh("setup", context.def.need).wait();
+    await execSh("ready", [workPath, context.defPath]).wait();
 
-    // --- 以下をテストケース毎に/マルチプロセスで並列に捌きたい
-    context.def.operations.forEach(o => { });
-    // 1 - inputディレクトリをworkにcopy
-    // 2 - workにcdしてコマンドをそのまま叩く
-    // 3 - outputディレクトリを用いて期待値を突合する
+    let count = context.def.operations.length;
+    for (let i = 1; i <= context.def.operations.length; i++) {
+        let ticket = execSh("execute", [workPath, `${i}`]);
+        ticket.wait().then(() => {
+            count--;
+            ticket.process;
+
+
+        }).catch(() => {
+            throw Error("Error occured in execute.sh.");
+        });
+    }
+
+    while (count > 0) await sleep(1);
 
 
 
 
     fs.rmSync(context.workPath, { force: true, recursive: true });
+}
+
+function sleep(sec: number) {
+    return new Promise((resolve) => setTimeout(resolve, sec * 1000));
 }
 
 function validate(context: BbtContext): void {

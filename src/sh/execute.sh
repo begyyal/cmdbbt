@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo $@ 
 for i in `seq 5`; do
