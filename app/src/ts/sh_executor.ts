@@ -26,10 +26,12 @@ export function execSh(exeName: string, args: string[] = []): Ticket {
     let cb = (error: ExecException | null, stdout: string | Buffer, stderr: string | Buffer) => {
         if (error)
             throw error;
-        if (stdout)
+        else if (stderr)
+            throw Error(stderr.toString());
+        else if (stdout)
             console.log(stdout);
         tic.end = true;
     };
-    tic.process = exec(SH_DIR + exeName + ".sh " + args.join(" "), {}, cb);
+    tic.process = exec(SH_DIR + exeName + ".sh " + args.join(" "), { windowsHide: true }, cb);
     return tic;
 }

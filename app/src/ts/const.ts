@@ -12,3 +12,18 @@ export class AssertionType {
         AssertionType.FILE_DELETE
     ];
 }
+
+export class PathConstants {
+
+    public static readonly WORK = "/mnt/work/";
+    public static readonly DEF = "/mnt/work/bbtdef.json";
+    public static readonly RESOURCE = "/mnt/work/resource/";
+    public static readonly ENV = "/mnt/work/env/";
+
+    public static readonly values = [
+        PathConstants.WORK,
+        PathConstants.DEF,
+        PathConstants.RESOURCE,
+        PathConstants.ENV
+    ];
+}
