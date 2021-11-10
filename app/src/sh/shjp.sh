@@ -22,16 +22,46 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-if [ $# -eq 0 ]; then
-    echo "Arguments lack." >&2
+if [ "$1" = -g ]; then
+    flg_get=1
+    shift
+    readonly input=$1
+    shift
+elif [ -p /dev/stdin ]; then
+    readonly input="$(cat)"
+else
+    readonly input=$1
+    shift
+fi
+
+if [ -z "$input" ]; then
+    echo "Input value is empty." >&2
     exit 1
 fi
 
-tmp_dir='/tmp/cmdbbt/'
-timestamp=$(date +%Y%m%d%H%M%S)
-tmp_id=$(ls -l $tmp_dir | grep $timestamp | wc -l)
-tmp=${tmp_dir}${timestamp}'_'${tmp_id}'/'
-mkdir -p $tmp
+function setupTmp(){
+    tmp_dir='/tmp/shjp/'
+    mkdir -p $tmp_dir
+    timestamp=$(date +%Y%m%d%H%M%S)
+    tmp_id=$(ls -l $tmp_dir | grep $timestamp | wc -l)
+    tmp=${tmp_dir}${timestamp}'_'${tmp_id}'/'
+    mkdir -p $tmp
+}
+
+function rmExpired(){
+    ts_sec=$(date +%s)
+    expired_sec=$(($ts_sec-60*60))
+    expired_date=$(date --date=@$expired_sec +%Y%m%d%H%M%S)
+    for d in `ls $tmp_dir`; do
+        d_date=${d:0:14}
+        if [[ $d_date =~ ^[0-9]+$ ]]; then
+            [ $d_date -lt $expired_date ] && rm -rdf ${tmp_dir}${d} || :
+        fi
+    done
+}
+
+setupTmp
+rmExpired
 
 function end(){
     rm -rdf ${tmp}
@@ -99,14 +129,6 @@ function extractValue(){
     cat ${tmp}answer
 }
 
-if [ "$1" = -g ]; then
-    flg_get=1
-    shift
-fi
-
-readonly input=$1
-shift
-
 declare -a targets
 while [ -n "$1" ]; do
     targets+=($1)
@@ -145,7 +167,7 @@ function preProcess(){
     done
 }
 
-if [ -f $input ]; then
+if [ -f "$input" ]; then
     json_value_origin="$(cat $input)"
 else
     json_value_origin="$input"
