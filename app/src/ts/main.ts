@@ -1,6 +1,5 @@
 import * as fs from "fs";
-import * as path from "path";
-import { BbtDef, isBbtDef, CmdDef, Check } from "./def";
+import { BbtDef, isBbtDef, CmdDef } from "./def";
 import { execSh } from "./sh_executor";
 import { AssertionType, PathConstants } from "./const";
 
@@ -24,21 +23,11 @@ async function main() {
 
     validate(def);
 
-    let count = def.operations.length;
     for (let i = 1; i <= def.operations.length; i++) {
         let args : string[] = [];
-        let ticket = execSh("execute", args.concat(PathConstants.values, i.toString()));
-        ticket.wait().then(() => {
-            count--;
-            ticket.process;
-
-
-        }).catch(() => {
-            throw Error("Error occured in execute.sh.");
-        });
+        // work, def, resource, env, index
+        execSh("execute", args.concat(PathConstants.values, i.toString()));
     }
-
-    while (count > 0) await sleep(1);
 }
 
 function getDef(): BbtDef {
@@ -46,10 +35,6 @@ function getDef(): BbtDef {
     if (!isBbtDef(def))
         throw Error("The bbt definition's format is invalid.");
     return def;
-}
-
-function sleep(sec: number) {
-    return new Promise((resolve) => setTimeout(resolve, sec * 1000));
 }
 
 function validate(def: BbtDef): void {

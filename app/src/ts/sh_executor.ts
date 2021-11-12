@@ -32,6 +32,6 @@ export function execSh(exeName: string, args: string[] = []): Ticket {
             console.log(stdout);
         tic.end = true;
     };
-    tic.process = exec(SH_DIR + exeName + ".sh " + args.join(" "), { windowsHide: true }, cb);
+    tic.process = exec(SH_DIR + exeName + ".sh " + args.join(" "), cb);
     return tic;
 }

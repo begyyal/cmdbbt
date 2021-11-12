@@ -26,10 +26,42 @@ function rmExpired(){
 setupTmp
 rmExpired
 
+function processShortOpt(){
+    for i in `seq 2 ${#opt}`; do
+        char=${opt:(($i-1)):1}
+        if [ "a$char" = o ]; then
+            opt_flag=$(($opt_flag|1))
+        else
+            echo "The specified option as $char is invalid." >&2
+            exit 1
+        fi
+    done    
+}
+
+function processOpt(){
+    for arg in "$@"; do
+        if [[ ! "$arg" =~ ^-.+ ]]; then
+            if [ $argext_flag = 1 ];
+                apts=$arg
+            fi
+            argext_flag=''
+        elif [ "$arg" = --omit-filedef ]; then
+            opt_flag=$(($opt_flag|1))
+        elif [ "$arg" = --apt-get ]; then
+            argext_flag=1
+        else
+            processShortOpt
+        fi
+    done
+    echo $opt_flag > ${tmp}opt_flag
+}
+
+processOpt
+
 def_path=${1:-./bbtdef.json}
 if [ ! -f "$def_path" ]; then
     echo "Definition file is not found." >&2
-    end 1
+    exit 1
 fi
 
 shjp=${cmd_dir}/app/src/sh/shjp.sh
@@ -44,7 +76,10 @@ for n in `$shjp -g ${tmp}def_comp need`; do
 done
 cp -r "./$($shjp -g ${tmp}def_comp resource)" ${tmp}resource/
 
-docker build -t cmdbbt $cmd_dir
+docker build \
+    -t cmdbbt \
+    --build-arg apts="${apts//,/ }" \
+    $cmd_dir
 
 run_args="\
     --rm \
