@@ -12,4 +12,4 @@ COPY /app .
 RUN npm install
 RUN npm run build
 
-ENTRYPOINT [ "nodejs", "/cmdbbt" ]
+ENTRYPOINT nodejs /cmdbbt

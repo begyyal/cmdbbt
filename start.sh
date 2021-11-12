@@ -29,7 +29,7 @@ rmExpired
 function processShortOpt(){
     for i in `seq 2 ${#opt}`; do
         char=${opt:(($i-1)):1}
-        if [ "a$char" = o ]; then
+        if [ "a$char" = ao ]; then
             opt_flag=$(($opt_flag|1))
         else
             echo "The specified option as $char is invalid." >&2
@@ -53,7 +53,6 @@ function processOpt(){
             processShortOpt
         fi
     done
-    echo $opt_flag > ${tmp}opt_flag
 }
 
 processOpt
@@ -70,7 +69,15 @@ $shjp -g ${tmp}def_comp operations > ${tmp}def_operations
 
 mkdir -p ${tmp}env/
 mkdir -p ${tmp}resource/
-cp $def_path ${tmp}bbtdef.json
+
+cat $def_path |
+grep -v ^$ |
+awk 'END{
+    match($0,/^.*}/); 
+    base=substr($0,0,RLENGTH-1)
+    print base ",\"opt_flag\":'$opt_flag'}"
+}' > ${tmp}bbtdef.json
+
 for n in `$shjp -g ${tmp}def_comp need`; do
     cp -r ./$n ${tmp}env/
 done
@@ -84,7 +91,7 @@ docker build \
 run_args="\
     --rm \
     --name cmdbbt \
-    -v `realpath $tmp`:/mnt/work \
+    -v `realpath $tmp`:/mnt/main \
     cmdbbt"
 os_name=$(uname)
 if [[ ${os_name,,} =~ ^(mingw).* ]]; then

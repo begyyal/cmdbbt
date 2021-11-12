@@ -15,15 +15,19 @@ export class AssertionType {
 
 export class PathConstants {
 
-    public static readonly WORK = "/mnt/work/";
-    public static readonly DEF = "/mnt/work/bbtdef.json";
-    public static readonly RESOURCE = "/mnt/work/resource/";
-    public static readonly ENV = "/mnt/work/env/";
+    public static readonly MNT_ROOT = "/mnt/main/";
+    public static readonly DEF = "/mnt/main/bbtdef.json";
+    public static readonly RESOURCE = "/mnt/main/resource/";
+    public static readonly ENV = "/mnt/main/env/";
 
     public static readonly values = [
-        PathConstants.WORK,
+        PathConstants.MNT_ROOT,
         PathConstants.DEF,
         PathConstants.RESOURCE,
         PathConstants.ENV
     ];
+}
+
+export class Option {
+    public static readonly OFD = 1;
 }

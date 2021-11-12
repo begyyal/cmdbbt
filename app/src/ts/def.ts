@@ -2,6 +2,7 @@ export interface BbtDef {
     need: string[];
     resource: string;
     operations: CmdDef[];
+    option: number;
 }
 
 export function isBbtDef(def: any): def is BbtDef {

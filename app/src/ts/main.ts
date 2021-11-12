@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import { BbtDef, isBbtDef, CmdDef } from "./def";
 import { execSh } from "./sh_executor";
-import { AssertionType, PathConstants } from "./const";
+import { AssertionType, PathConstants, Option } from "./const";
 
 function owata_(promise: Promise<any>) {
     return promise.catch(e => {
@@ -23,11 +23,20 @@ async function main() {
 
     validate(def);
 
+    let exePromises = [];
     for (let i = 1; i <= def.operations.length; i++) {
-        let args : string[] = [];
-        // work, def, resource, env, index
-        execSh("execute", args.concat(PathConstants.values, i.toString()));
+        let args: string[] = [];
+        // mnt, def, resource, env, index, option
+        const ticket = execSh("execute", args.concat(
+            PathConstants.values,
+            i.toString(),
+            def.option.toString()));
+        exePromises.push(ticket.wait());
     }
+
+    await Promise.all(exePromises);
+    
+    // /work/[testname]/failure で結果確認および出力
 }
 
 function getDef(): BbtDef {
@@ -37,31 +46,37 @@ function getDef(): BbtDef {
     return def;
 }
 
+function checkOptFlag(opt: number, flag: number): boolean {
+    return (opt & flag) == flag;
+}
+
 function validate(def: BbtDef): void {
 
     const nameSet = new Set(def.operations.map(o => o.name));
     if (nameSet.size != def.operations.length)
         throw Error("The operation's name must not be duplicated.");
 
-    def.operations.forEach(o => validatePerOpe(o));
+    const ofd = checkOptFlag(def.option, Option.OFD);
+    def.operations.forEach(o => validatePerOpe(o, ofd));
 }
 
-function validatePerOpe(def: CmdDef): void {
+function validatePerOpe(def: CmdDef, ofd: boolean): void {
     def.expected.forEach(c => {
 
         if (!AssertionType.values.includes(c.act))
             throw Error("Invalid act type is found. The operation's name is [" + def.name + "].");
 
-        if (c.act == AssertionType.FILE_OUTPUT
-            && !fs.existsSync(PathConstants.RESOURCE + "output/" + c.value))
-            throw Error("Resource files lack. The operation's name is [" + def.name + "].");
-        if (c.act == AssertionType.FILE_UPDATE
-            && (!fs.existsSync(PathConstants.RESOURCE + "input/" + c.value)
-                || !fs.existsSync(PathConstants.RESOURCE + "output/" + c.value)))
-            throw Error("Resource files lack. The operation's name is [" + def.name + "].");
-        if (c.act == AssertionType.FILE_DELETE
-            && !fs.existsSync(PathConstants.RESOURCE + "input/" + c.value))
-            throw Error("Resource files lack. The operation's name is [" + def.name + "].");
+        if (!ofd) {
+            const resourceInput = PathConstants.RESOURCE + def.name + "/input/" + c.value;
+            const resourceOutput = PathConstants.RESOURCE + def.name + "/output/" + c.value;
+            if (c.act == AssertionType.FILE_OUTPUT && !fs.existsSync(resourceOutput))
+                throw Error("Resource file lacks. The operation's name is [" + def.name + "].");
+            if (c.act == AssertionType.FILE_UPDATE
+                && (!fs.existsSync(resourceInput) || !fs.existsSync(resourceOutput)))
+                throw Error("Resource file lacks. The operation's name is [" + def.name + "].");
+            if (c.act == AssertionType.FILE_DELETE && !fs.existsSync(resourceInput))
+                throw Error("Resource file lacks. The operation's name is [" + def.name + "].");
+        }
     });
 }
 
