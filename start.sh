@@ -71,7 +71,7 @@ mkdir -p ${tmp}env/
 mkdir -p ${tmp}resource/
 
 cat $def_path |
-grep -v ^$ |
+grep -v "^\s*$" |
 awk 'END{
     match($0,/^.*}/); 
     base=substr($0,0,RLENGTH-1)
