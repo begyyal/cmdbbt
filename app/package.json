@@ -2,9 +2,9 @@
   "name": "cmdbbt",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "lib/main.js",
   "scripts": {
-    "build": "tsc && webpack && cp ./src/sh ./dist -r"
+    "build": "tsc -sourcemap && cp ./src/sh ./lib -r"
   },
   "repository": {
     "type": "git",
@@ -17,7 +17,9 @@
     "url": "https://github.com/begyyal/cmdbbt/issues"
   },
   "homepage": "https://github.com/begyyal/cmdbbt#readme",
-  "dependencies": {},
+  "dependencies": {
+    "source-map-support": "^0.5.21"
+  },
   "devDependencies": {
     "@types/node": "^16.9.0",
     "license-webpack-plugin": "^2.3.21",

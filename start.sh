@@ -41,7 +41,7 @@ function processShortOpt(){
 function processOpt(){
     for arg in "$@"; do
         if [[ ! "$arg" =~ ^-.+ ]]; then
-            if [ $argext_flag = 1 ];
+            if [ "$argext_flag" = 1 ]; then
                 apts=$arg
             fi
             argext_flag=''

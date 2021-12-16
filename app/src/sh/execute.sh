@@ -24,11 +24,6 @@ cp $path_resource $path_work
 cd $path_work
 eval "$command" > ${tmp}co_result
 
-function end(){
-    echo "$idx $1 |||| $test_name"
-    exit 0
-}
-
 ./shjp.sh -g ${tmp}ope_comp expected |
 while read check; do
 
@@ -37,8 +32,11 @@ while read check; do
     ./shjp.sh -g ${tmp}ope_comp value > ${tmp}expected_v
 
     if [ $act = console-output ]; then
-        difft -q ${tmp}expected_v ${tmp}co_result >/dev/null 2>/dev/null
-        [ $? != 0 ] && touch ${tmp}failure || :
+        diff -q ${tmp}expected_v ${tmp}co_result >/dev/null 2>/dev/null
+        if [ $? != 0 ]; then
+            touch ${tmp}failure
+            break
+        fi
     elif [ $ofd_flag = 1 ]; then
         continue
     fi
@@ -53,3 +51,4 @@ while read check; do
     fi
 done
 
+exit 0

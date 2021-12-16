@@ -28,6 +28,15 @@ export class PathConstants {
     ];
 }
 
+export class ResultStatus {
+    public static readonly OK = "ok";
+    public static readonly NG = "ng";
+
+    public static get(b: boolean) {
+        return b ? this.OK : this.NG;
+    }
+}
+
 export class Option {
     public static readonly OFD = 1;
 }

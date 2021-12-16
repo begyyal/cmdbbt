@@ -1,7 +1,8 @@
 import * as fs from "fs";
 import { BbtDef, isBbtDef, CmdDef } from "./def";
 import { execSh } from "./sh_executor";
-import { AssertionType, PathConstants, Option } from "./const";
+import * as cst from "./const";
+import 'source-map-support/register';
 
 function owata_(promise: Promise<any>) {
     return promise.catch(e => {
@@ -11,7 +12,12 @@ function owata_(promise: Promise<any>) {
         };
         if (hasCode(e))
             console.error("exit code -> " + e.code);
-        console.error(e instanceof Error ? e.message : e);
+        if(e instanceof Error){
+            console.error(e.message);
+            if(e.stack)
+                console.error(e.stack);
+        }else
+            console.error(e);
 
         process.exit(-1);
     });
@@ -28,19 +34,19 @@ async function main() {
         let args: string[] = [];
         // mnt, def, resource, env, index, option
         const ticket = execSh("execute", args.concat(
-            PathConstants.values,
+            cst.PathConstants.values,
             i.toString(),
             def.option.toString()));
         exePromises.push(ticket.wait());
     }
 
     await Promise.all(exePromises);
-    
-    // /work/[testname]/failure で結果確認および出力
+
+    summalize(def.operations);
 }
 
 function getDef(): BbtDef {
-    let def = JSON.parse(fs.readFileSync(PathConstants.DEF, 'utf-8'));
+    let def = JSON.parse(fs.readFileSync(cst.PathConstants.DEF, 'utf-8'));
     if (!isBbtDef(def))
         throw Error("The bbt definition's format is invalid.");
     return def;
@@ -56,28 +62,38 @@ function validate(def: BbtDef): void {
     if (nameSet.size != def.operations.length)
         throw Error("The operation's name must not be duplicated.");
 
-    const ofd = checkOptFlag(def.option, Option.OFD);
+    const ofd = checkOptFlag(def.option, cst.Option.OFD);
     def.operations.forEach(o => validatePerOpe(o, ofd));
 }
 
 function validatePerOpe(def: CmdDef, ofd: boolean): void {
     def.expected.forEach(c => {
 
-        if (!AssertionType.values.includes(c.act))
+        if (!cst.AssertionType.values.includes(c.act))
             throw Error("Invalid act type is found. The operation's name is [" + def.name + "].");
 
         if (!ofd) {
-            const resourceInput = PathConstants.RESOURCE + def.name + "/input/" + c.value;
-            const resourceOutput = PathConstants.RESOURCE + def.name + "/output/" + c.value;
-            if (c.act == AssertionType.FILE_OUTPUT && !fs.existsSync(resourceOutput))
+            const resourceInput = cst.PathConstants.RESOURCE + def.name + "/input/" + c.value;
+            const resourceOutput = cst.PathConstants.RESOURCE + def.name + "/output/" + c.value;
+            if (c.act == cst.AssertionType.FILE_OUTPUT && !fs.existsSync(resourceOutput))
                 throw Error("Resource file lacks. The operation's name is [" + def.name + "].");
-            if (c.act == AssertionType.FILE_UPDATE
+            if (c.act == cst.AssertionType.FILE_UPDATE
                 && (!fs.existsSync(resourceInput) || !fs.existsSync(resourceOutput)))
                 throw Error("Resource file lacks. The operation's name is [" + def.name + "].");
-            if (c.act == AssertionType.FILE_DELETE && !fs.existsSync(resourceInput))
+            if (c.act == cst.AssertionType.FILE_DELETE && !fs.existsSync(resourceInput))
                 throw Error("Resource file lacks. The operation's name is [" + def.name + "].");
         }
     });
+}
+
+function summalize(opes: CmdDef[]) {
+    const total = opes.map(o => {
+        let result = cst.ResultStatus.get(fs.existsSync("/work/" + o.name + "/failure"));
+        console.log(result + " |||| " + o.name);
+        return result;
+    }).every(r => r == cst.ResultStatus.OK);
+    console.log("----------");
+    console.log(cst.ResultStatus.get(total).toUpperCase() + " |||| TOTAL");
 }
 
 owata_(main());
