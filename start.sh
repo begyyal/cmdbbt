@@ -72,11 +72,15 @@ mkdir -p ${tmp}resource/
 
 cat $def_path |
 grep -v "^\s*$" |
-awk 'END{
-    match($0,/^.*}/); 
-    base=substr($0,0,RLENGTH-1)
-    print base ",\"opt_flag\":'$opt_flag'}"
-}' > ${tmp}bbtdef.json
+if [ -z "$opt_flag" ]; then 
+    cat
+else
+    awk '{print}END{
+        match($0,/^.*}/); 
+        base=substr($0,0,RLENGTH-1)
+        print base ",\"opt_flag\":'$opt_flag'}"
+    }' 
+fi > ${tmp}bbtdef.json
 
 for n in `$shjp -g ${tmp}def_comp need`; do
     cp -r ./$n ${tmp}env/
