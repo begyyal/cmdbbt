@@ -85,7 +85,11 @@ fi > ${tmp}bbtdef.json
 for n in `$shjp -g ${tmp}def_comp need`; do
     cp -r ./$n ${tmp}env/
 done
-cp -r "./$($shjp -g ${tmp}def_comp resource)" ${tmp}resource/
+
+rsc_path_def="./$($shjp -g ${tmp}def_comp resource)" 
+for n in `ls $rsc_path_def`; do
+    cp -r ${rsc_path_def}${n} ${tmp}resource/
+done
 
 docker build \
     -t cmdbbt \

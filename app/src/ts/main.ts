@@ -30,13 +30,14 @@ async function main() {
     validate(def);
 
     let exePromises = [];
-    for (let i = 1; i <= def.operations.length; i++) {
+//    for (let i = 1; i <= def.operations.length; i++) {
+    for (let i = 1; i <= 1; i++) {
         let args: string[] = [];
         // mnt, def, resource, env, index, option
         const ticket = execSh("execute", args.concat(
             cst.PathConstants.values,
             i.toString(),
-            def.option.toString()));
+            def.option?.toString()));
         exePromises.push(ticket.wait());
     }
 
@@ -88,7 +89,7 @@ function validatePerOpe(def: CmdDef, ofd: boolean): void {
 
 function summalize(opes: CmdDef[]) {
     const total = opes.map(o => {
-        let result = cst.ResultStatus.get(fs.existsSync("/work/" + o.name + "/failure"));
+        let result = cst.ResultStatus.get(!fs.existsSync("/work/" + o.name + "/failure"));
         console.log(result + " |||| " + o.name);
         return result;
     }).every(r => r == cst.ResultStatus.OK);

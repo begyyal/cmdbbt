@@ -22,12 +22,14 @@ export function isBbtDef(def: any): def is BbtDef {
 export interface CmdDef {
     name: string;
     command: string;
+    exitCode: number;
     expected: Check[];
 }
 
 export function isCmdDef(def: any): def is CmdDef {
     let ok = def.name !== undefined
         && def.command !== undefined
+        && def.exitCode !== undefined
         && def.expected !== undefined;
     if (ok) {
         let exp = def.expected;

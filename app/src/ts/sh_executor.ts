@@ -24,12 +24,12 @@ function sleep(sec: number) {
 export function execSh(exeName: string, args: string[] = []): Ticket {
     let tic = new Ticket();
     let cb = (error: ExecException | null, stdout: string | Buffer, stderr: string | Buffer) => {
+        if (stdout)
+            console.log(stdout);
         if (error)
             throw error;
         else if (stderr)
             throw Error(stderr.toString());
-        else if (stdout)
-            console.log(stdout);
         tic.end = true;
     };
     tic.process = exec(SH_DIR + exeName + ".sh " + args.join(" "), cb);
