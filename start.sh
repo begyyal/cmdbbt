@@ -104,7 +104,13 @@ done
 docker build \
     -t cmdbbt \
     --build-arg apts="${apts//,/ }" \
-    $cmd_dir 2>/dev/null
+    $cmd_dir 2>${tmp}build_err
+exit_code=$?
+if [ $exit_code != 0 ]; then
+    cat ${tmp}build_err >&2
+    rm -rdf ${tmp}
+    exit $exit_code
+fi
 
 run_args="\
     --rm \
