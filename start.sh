@@ -107,5 +107,7 @@ if [[ ${os_name,,} =~ ^(mingw).* ]]; then
 else
     docker run $run_args
 fi
+[ $? != 0 ] && exit_code=$? || :
 
 rm -rdf ${tmp}
+exit $?

@@ -1,5 +1,13 @@
 #!/bin/bash
 
+readonly CAUSE=(
+    "exit-code"
+    "console-output"
+    "file-output"
+    "file-update"
+    "file-delete"
+) 
+
 function printStacktrace() {
     index=1
     while frame=($(caller "${index}")); do
@@ -21,22 +29,27 @@ path_mnt=$1 && shift
 path_def=$1 && shift
 path_resource=$1 && shift
 path_env=$1 && shift
+idx=$1 && shift
+name=$1 && shift
 
-idx=$1
-tmp="/tmp/$idx/"
+tmp="/tmp/$name/"
+result="/result/$name/"
 mkdir -p $tmp
+mkdir -p $result
+
 cat ${path_mnt}def_operations | 
 awk 'NR=='$idx |
 $shjp > ${tmp}ope_comp
+checkErr
 shift
 
 opt_flag=${1:-0}
 ofd_flag=$(($opt_flag&1))
 
-test_name="$($shjp -g ${tmp}ope_comp name)"
-command="$($shjp -g ${tmp}ope_comp command)"
-path_resource=${path_resource}${test_name}/input/
-path_work=/work/${test_name}/
+$shjp -g ${tmp}ope_comp "command" > ${tmp}command
+checkErr
+path_resource=${path_resource}${name}/input/
+path_work=/work/${name}/
 mkdir -p $path_work
 
 for n in `ls $path_env`; do
@@ -49,9 +62,18 @@ if [ -d $path_resource ]; then
 fi
 
 cd $path_work
-eval "$command" > ${tmp}co_result
-if [ $? != "$($shjp -g ${tmp}ope_comp exitCode)" ]; then
-    touch ${tmp}failure
+co_count=$(cat ${tmp}command | wc -l)
+for i in `seq 1 $co_count`; do
+    co="$(cat ${tmp}command | awk 'NR=='$i)"
+    eval "$co" >>${tmp}co_result 2>/dev/null
+    act_code=$?
+    [ $act_code != 0 ] && break || :
+done
+
+exp_code="$($shjp -g ${tmp}ope_comp exitCode)"
+if [ $act_code != $exp_code ]; then
+    echo ${CAUSE[0]} > ${result}failure
+    echo $act_code > ${result}actual
     exit 0
 fi
 
@@ -63,12 +85,11 @@ while read check; do
     $shjp -g ${tmp}check_comp value > ${tmp}expected_v
 
     if [ $act = console-output ]; then
-        :
-    elif [ $act = console-output ]; then
         diff -q ${tmp}expected_v ${tmp}co_result >/dev/null 2>/dev/null
         if [ $? != 0 ]; then
-            touch ${tmp}failure
-            break
+            echo ${CAUSE[1]} > ${result}failure
+            cat ${tmp}co_result > ${result}actual
+            exit 1
         fi
     elif [ $ofd_flag = 1 ]; then
         continue
@@ -83,6 +104,5 @@ while read check; do
         :
     fi
 done
-checkErr
 
 exit 0

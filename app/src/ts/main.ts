@@ -12,11 +12,11 @@ function owata_(promise: Promise<any>) {
         };
         if (hasCode(e))
             console.error("exit code -> " + e.code);
-        if(e instanceof Error){
+        if (e instanceof Error) {
             console.error(e.message);
-            if(e.stack)
+            if (e.stack)
                 console.error(e.stack);
-        }else
+        } else
             console.error(e);
 
         process.exit(-1);
@@ -29,21 +29,23 @@ async function main() {
 
     validate(def);
 
+    fs.mkdirSync("/result/");
     let exePromises = [];
-//    for (let i = 1; i <= def.operations.length; i++) {
-    for (let i = 1; i <= 1; i++) {
+    for (let i = 1; i <= def.operations.length; i++) {
         let args: string[] = [];
-        // mnt, def, resource, env, index, option
+        // mnt, def, resource, env, index, name, option
         const ticket = execSh("execute", args.concat(
             cst.PathConstants.values,
             i.toString(),
+            def.operations[i - 1].name,
             def.option?.toString()));
         exePromises.push(ticket.wait());
     }
 
     await Promise.all(exePromises);
 
-    summalize(def.operations);
+    if (!summalize(def.operations))
+        process.exit(-1);
 }
 
 function getDef(): BbtDef {
@@ -87,14 +89,27 @@ function validatePerOpe(def: CmdDef, ofd: boolean): void {
     });
 }
 
-function summalize(opes: CmdDef[]) {
-    const total = opes.map(o => {
-        let result = cst.ResultStatus.get(!fs.existsSync("/work/" + o.name + "/failure"));
-        console.log(result + " |||| " + o.name);
-        return result;
-    }).every(r => r == cst.ResultStatus.OK);
-    console.log("----------");
-    console.log(cst.ResultStatus.get(total).toUpperCase() + " |||| TOTAL");
+function summalize(opes: CmdDef[]): boolean {
+
+    const errList = opes.map(o => {
+        const fpath = "/result/" + o.name + "/failure";
+        const apath = "/result/" + o.name + "/actual";
+        if (fs.existsSync(fpath))
+            return {
+                name: o.name,
+                cause: fs.readFileSync(fpath),
+                actual: fs.readFileSync(apath)
+            };
+        return null;
+    }).filter(d => d != null);
+
+    const summary = {
+        result: errList.length == 0,
+        errList: errList
+    };
+
+    console.info(JSON.stringify(summary));
+    return summary.result;
 }
 
 owata_(main());
