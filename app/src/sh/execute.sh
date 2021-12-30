@@ -87,7 +87,7 @@ while read check; do
     if [ $act = console-output ]; then
         diff -q ${tmp}expected_v ${tmp}co_result >/dev/null 2>/dev/null
         if [ $? != 0 ]; then
-            echo ${CAUSE[1]} > ${result}failure
+            printf ${CAUSE[1]} > ${result}failure
             cat ${tmp}co_result > ${result}actual
             exit 1
         fi

@@ -1,14 +1,24 @@
-#!/bin/bash -e
+#!/bin/bash
 
 cmd_dir=`dirname $0`
+
+function generateTmpPath(){
+    tmp_id="-1"
+    for id in $(ls -1 $tmp_dir | grep $timestamp | cut -d _ -f 2); do
+        [[ "$id" =~ ^[0-9]+$ ]] || continue
+        [ "$tmp_id" -lt $id ] && tmp_id=$id || :
+    done
+    tmp=${tmp_dir}${timestamp}'_'$(($tmp_id+1))'/'
+}
 
 function setupTmp(){
     tmp_dir=$cmd_dir'/tmp/'
     mkdir -p $tmp_dir
     timestamp=$(date +%Y%m%d%H%M%S)
-    tmp_id=${timestamp}'_'$(ls -l $tmp_dir | grep $timestamp | wc -l)
-    tmp=${tmp_dir}${tmp_id}'/'
-    mkdir -p $tmp
+    generateTmpPath
+    while ! mkdir $tmp 2>/dev/null; do
+        generateTmpPath
+    done
 }
 
 function rmExpired(){
@@ -94,7 +104,7 @@ done
 docker build \
     -t cmdbbt \
     --build-arg apts="${apts//,/ }" \
-    $cmd_dir
+    $cmd_dir 2>/dev/null
 
 run_args="\
     --rm \
@@ -110,4 +120,4 @@ fi
 [ $? != 0 ] && exit_code=$? || :
 
 rm -rdf ${tmp}
-exit $?
+exit $exit_code
