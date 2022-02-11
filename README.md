@@ -47,7 +47,7 @@ It shows definition format, result format, and above shell options in following.
 - `resource`
   - Required assets for each test commands.
   - This is treated relative path from directory path of definition.
-  - Please set directories named `operations.name` by operation, and create `input` and `output` directories under it`s named directories if you need.
+  - Please set directories named `operations[].name` by operation, and create `input` and `output` directories under it`s named directories if you need.
   - It shows directory structure example in following.
   ```
   resource/cmdbbt/test1/input/hoge
