@@ -50,10 +50,9 @@ It shows definition format, result format, and above shell options in following.
   - Please set directories named `operations[].name` by operation, and create `input` and `output` directories under it`s named directories if you need.
   - It shows directory structure example in following.
   ```
-  resource/cmdbbt/test1/input/hoge
-  resource/cmdbbt/test1/output/fuga
-  resource/cmdbbt/test2/input/test.txt
-  resource/cmdbbt/test2/output/test.txt
+  resource/cmdbbt/test1/input/test.json
+  resource/cmdbbt/test2/input/hoge.txt
+  resource/cmdbbt/test2/output/fuga.txt
   ```
 - `operations`
   - A operation in this means one command execution and checkings.
