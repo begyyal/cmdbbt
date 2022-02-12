@@ -101,8 +101,9 @@ for n in `ls $rsc_path_def`; do
     cp -r ${rsc_path_def}${n} ${tmp}resource/
 done
 
+doc_name=$(pwd | md5sum | cut -d " " -f 1)_cmdbbt
 docker build \
-    -t cmdbbt \
+    -t $doc_name \
     --build-arg apts="${apts//,/ }" \
     $cmd_dir 2>${tmp}build_err
 exit_code=$?
@@ -114,9 +115,9 @@ fi
 
 run_args="\
     --rm \
-    --name cmdbbt \
+    --name $doc_name \
     -v `realpath $tmp`:/mnt/main \
-    cmdbbt"
+    $doc_name"
 os_name=$(uname)
 if [[ ${os_name,,} =~ ^(mingw).* ]]; then
     MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL="*" docker run $run_args
