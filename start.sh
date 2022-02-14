@@ -53,6 +53,8 @@ function processOpt(){
         if [[ ! "$arg" =~ ^-.+ ]]; then
             if [ "$argext_flag" = 1 ]; then
                 apts=$arg
+            elif [ -z "$def_path" ]; then
+                def_path=$arg
             fi
             argext_flag=''
         elif [ "$arg" = --omit-filedef ]; then
@@ -67,7 +69,7 @@ function processOpt(){
 
 processOpt
 
-def_path=${1:-./bbtdef.json}
+def_path=${def_path:-./bbtdef.json}
 if [ ! -f "$def_path" ]; then
     echo "Definition file is not found." >&2
     exit 1
