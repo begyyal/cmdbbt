@@ -84,6 +84,7 @@ In this case, first argument excluding options is treated definition`s name.
 - `operations[].expected[].value`
   - The value what is expected to matches.
   - If act type is file matching, this value is treated as a file path.
+  - If act type is console-output, array can express multiple line.
 
 ## Result format
 
