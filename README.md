@@ -4,12 +4,12 @@ CMDBBT is a automatic testing tool.
 It performs based on the definition described in advance,  
 and executes the described command, confirms the results if it matches expected results.
 
-## Premise
+# Premise
 
 - MIT Lisense, description is in source file.
 - Compliant to Bash and Docker.
 
-## How to use
+# How to use
 
 Just only describes the definition and execute `./start.sh` .  
 The command must be executed at the definition path, not cmdbbt repository root.  
@@ -17,12 +17,16 @@ The result is output in stdout.
 
 It shows definition format, result format, and above shell options in following.  
 
-### Definition format
+## Definition format
+
+The definition\`s file is opened as `bbtdef.json` in default.  
+If you want to name other, please add definition\`s name to command arguments.  
+In this case, first argument excluding options is treated definition`s name.  
 
 ```
 {
 	"need": [
-		"shjp.sh"
+		"a/b/shjp.sh"
 	],
 	"resource": "resource/cmdbbt/",
 	"operations": [
@@ -44,6 +48,7 @@ It shows definition format, result format, and above shell options in following.
 - `need`
   - Common required assets for test commands.
   - This is treated relative path from directory path of definition.
+  - Only tip of directory hierarchy is copied to docker, so should describes `./shjp.sh` not `./a/b/shjp.sh` at command in above example.
 - `resource`
   - Required assets for each test commands.
   - This is treated relative path from directory path of definition.
@@ -79,8 +84,9 @@ It shows definition format, result format, and above shell options in following.
 - `operations[].expected[].value`
   - The value what is expected to matches.
   - If act type is file matching, this value is treated as a file path.
+  - If act type is console-output, array can express multiple line.
 
-### Result format
+## Result format
 
 ```
 {
@@ -109,7 +115,7 @@ It shows definition format, result format, and above shell options in following.
   - Actual values which differed from expected by executing command.
   - If cause type is file matching, this value sets as a file path.
 
-### Command options
+## Command options
 
 |long|short|detail|
 |:---|:---|:---|
