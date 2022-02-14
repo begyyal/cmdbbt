@@ -26,7 +26,7 @@ In this case, first argument excluding options is treated definition`s name.
 ```
 {
 	"need": [
-		"shjp.sh"
+		"a/b/shjp.sh"
 	],
 	"resource": "resource/cmdbbt/",
 	"operations": [
@@ -48,6 +48,7 @@ In this case, first argument excluding options is treated definition`s name.
 - `need`
   - Common required assets for test commands.
   - This is treated relative path from directory path of definition.
+  - Only tip of directory hierarchy is copied to docker, so should describes `./shjp.sh` not `./a/b/shjp.sh` at command in above example.
 - `resource`
   - Required assets for each test commands.
   - This is treated relative path from directory path of definition.
