@@ -80,7 +80,7 @@ fi
 $shjp -g ${tmp}ope_comp expected |
 while read check; do
 
-    $shjp $check > ${tmp}check_comp
+    $shjp "$check" > ${tmp}check_comp
     act="$($shjp -g ${tmp}check_comp act)"
     $shjp -g ${tmp}check_comp value > ${tmp}expected_v
 
