@@ -97,7 +97,7 @@ function summalize(opes: CmdDef[]): boolean {
         if (fs.existsSync(fpath))
             return {
                 name: o.name,
-                cause: fs.readFileSync(fpath, 'utf-8'),
+                cause: fs.readFileSync(fpath, 'utf-8').trimEnd().split(/\n/),
                 actual: fs.readFileSync(apath, 'utf-8').trimEnd().split(/\n/)
             };
         return null;
