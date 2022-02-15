@@ -67,7 +67,7 @@ function processOpt(){
     done
 }
 
-processOpt
+processOpt "$@"
 
 def_path=${def_path:-./bbtdef.json}
 if [ ! -f "$def_path" ]; then
