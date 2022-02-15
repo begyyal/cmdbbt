@@ -110,7 +110,7 @@ In this case, first argument excluding options is treated definition`s name.
 - `errList.name`
   - This is tied to `operations[].name`.
 - `errList.cause`
-  - This is tied to `operations[].expected[].act`.
+  - Type of a factor of the failure, This is tied to `operations[].expected[].act` or be `exit-code`.
 - `errList.actual`
   - Actual values which differed from expected by executing command.
   - If cause type is file matching, this value sets as a file path.
