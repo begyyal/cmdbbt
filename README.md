@@ -120,4 +120,4 @@ In this case, first argument excluding options is treated definition`s name.
 |long|short|detail|
 |:---|:---|:---|
 |--omit-filedef|-o|Omitting `operations[].expected[].act` of file matching.<br>If this is active, it checks if file match implicitly with the resource folder as positive.|
-|--apt-get||Required library of apt-get as runtime enviroment.<br>If need multiple, please separating by commma.|
+|--apt-get||Required library of apt-get as runtime enviroment.<br>Cmdbbt uses ubuntu image, so the library should be listed in [here](https://packages.ubuntu.com/en/).<br>If need multiple, please separating by commma.|
