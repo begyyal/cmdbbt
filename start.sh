@@ -37,6 +37,7 @@ setupTmp
 rmExpired
 
 function processShortOpt(){
+    opt=$1
     for i in `seq 2 ${#opt}`; do
         char=${opt:(($i-1)):1}
         if [ "a$char" = ao ]; then
@@ -62,7 +63,7 @@ function processOpt(){
         elif [ "$arg" = --apt-get ]; then
             argext_flag=1
         else
-            processShortOpt
+            processShortOpt "$arg"
         fi
     done
 }
