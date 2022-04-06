@@ -23,7 +23,7 @@ function checkErr(){
     fi
 }
 
-shjp=/cmdbbt/lib/sh/shjp.sh
+shjp=/cmdbbt/lib/sh/shjp
 
 path_mnt=$1 && shift
 path_def=$1 && shift
@@ -46,7 +46,7 @@ shift
 opt_flag=${1:-0}
 ofd_flag=$(($opt_flag&1))
 
-$shjp -g ${tmp}ope_comp "command" > ${tmp}command
+$shjp ${tmp}ope_comp -g "command" > ${tmp}command
 checkErr
 path_resource=${path_resource}${name}/input/
 path_work=/work/${name}/
@@ -70,19 +70,19 @@ for i in `seq 1 $co_count`; do
     [ $act_code != 0 ] && break || :
 done
 
-exp_code="$($shjp -g ${tmp}ope_comp exitCode)"
+exp_code="$($shjp ${tmp}ope_comp -g exitCode)"
 if [ $act_code != $exp_code ]; then
     echo ${CAUSE[0]} > ${result}failure
     echo $act_code > ${result}actual
     exit 0
 fi
 
-$shjp -g ${tmp}ope_comp expected |
+$shjp ${tmp}ope_comp -g expected |
 while read check; do
 
     $shjp "$check" > ${tmp}check_comp
-    act="$($shjp -g ${tmp}check_comp act)"
-    $shjp -g ${tmp}check_comp value > ${tmp}expected_v
+    act="$($shjp ${tmp}check_comp -g act)"
+    $shjp ${tmp}check_comp -g value > ${tmp}expected_v
 
     if [ $act = console-output ]; then
         diff -q ${tmp}expected_v ${tmp}co_result >/dev/null 2>/dev/null

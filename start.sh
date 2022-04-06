@@ -76,9 +76,9 @@ if [ ! -f "$def_path" ]; then
     exit 1
 fi
 
-shjp=${cmd_dir}/app/src/sh/shjp.sh
+shjp=${cmd_dir}/app/src/sh/shjp
 $shjp $def_path > ${tmp}def_comp
-$shjp -g ${tmp}def_comp operations > ${tmp}def_operations
+$shjp ${tmp}def_comp -g operations > ${tmp}def_operations
 
 mkdir -p ${tmp}env/
 mkdir -p ${tmp}resource/
@@ -95,11 +95,11 @@ else
     }' 
 fi > ${tmp}bbtdef.json
 
-for n in `$shjp -g ${tmp}def_comp need`; do
+for n in `$shjp ${tmp}def_comp -g need`; do
     cp -r ./$n ${tmp}env/
 done
 
-rsc_path_def="./$($shjp -g ${tmp}def_comp resource)" 
+rsc_path_def="./$($shjp ${tmp}def_comp -g resource)" 
 for n in `ls $rsc_path_def`; do
     cp -r ${rsc_path_def}${n} ${tmp}resource/
 done
