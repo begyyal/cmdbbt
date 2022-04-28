@@ -2,6 +2,10 @@
 
 cmd_dir=`dirname $0`
 
+shjp=${cmd_dir}/app/src/sh/shjp
+chmod +x ${shjp}
+chmod +x ${cmd_dir}/app/src/sh/execute.sh
+
 function generateTmpPath(){
     tmp_id="-1"
     for id in $(ls -1 $tmp_dir | grep $timestamp | cut -d _ -f 2); do
@@ -76,7 +80,6 @@ if [ ! -f "$def_path" ]; then
     exit 1
 fi
 
-shjp=${cmd_dir}/app/src/sh/shjp
 $shjp $def_path > ${tmp}def_comp
 $shjp ${tmp}def_comp -g operations > ${tmp}def_operations
 
