@@ -48,11 +48,11 @@ In this case, first argument excluding options is treated definition`s name.
 - `need`
   - Common required assets for test commands.
   - This is treated relative path from directory path of definition.
-  - Only tip of directory hierarchy is copied to docker, so should describes `./shjp.sh` not `./a/b/shjp.sh` at command in above example.
+  - Only tip of directory hierarchy is copied to docker, so should describes `./shjp.sh` not `./a/b/shjp.sh` at test commands in above example.
 - `resource`
   - Required assets for each test commands.
   - This is treated relative path from directory path of definition.
-  - Please set directories named `operations[].name` by operation, and create `input` and `output` directories under it`s named directories if you need.
+  - Please set directories named as `operations[].name` by operation, and create `input` and `output` directories under it`s named directories if you need.
   - It shows directory structure example in following.
   ```
   resource/cmdbbt/test1/input/test.json
@@ -120,4 +120,4 @@ In this case, first argument excluding options is treated definition`s name.
 |long|short|detail|
 |:---|:---|:---|
 |--omit-filedef|-o|Omitting `operations[].expected[].act` of file matching.<br>If this is active, it checks if file match implicitly with the resource folder as positive.|
-|--apt-get||Required library of apt-get as runtime enviroment.<br>Cmdbbt uses ubuntu image, so the library should be listed in [here](https://packages.ubuntu.com/en/).<br>If need multiple, please separating by commma.|
+|--apt-get||Required library got by apt-get as runtime enviroment.<br>Cmdbbt uses ubuntu image, so the library should be listed in [here](https://packages.ubuntu.com/en/).<br>If need multiple, please separating by commma.|

@@ -1,40 +1,21 @@
-export class AssertionType {
 
-    public static readonly CONSOLE_OUTPUT = "console-output";
-    public static readonly FILE_OUTPUT = "file-output";
-    public static readonly FILE_UPDATE = "file-update";
-    public static readonly FILE_DELETE = "file-delete";
-
-    public static readonly values = [
-        AssertionType.CONSOLE_OUTPUT,
-        AssertionType.FILE_OUTPUT,
-        AssertionType.FILE_UPDATE,
-        AssertionType.FILE_DELETE
-    ];
+export const s_assertionType = {
+    ConsoleOutput: "console-output",
+    FileOutput: "file-output",
+    FileUpdate: "file-update",
+    FileDelete: "file-delete"
 }
 
-export class PathConstants {
-
-    public static readonly MNT_ROOT = "/mnt/main/";
-    public static readonly DEF = "/mnt/main/bbtdef.json";
-    public static readonly RESOURCE = "/mnt/main/resource/";
-    public static readonly ENV = "/mnt/main/env/";
-
-    public static readonly values = [
-        PathConstants.MNT_ROOT,
-        PathConstants.DEF,
-        PathConstants.RESOURCE,
-        PathConstants.ENV
-    ];
+export const s_pathSet = {
+    MntRoot: "/mnt/main/",
+    Def: "/mnt/main/bbtdef.json",
+    Resource: "/mnt/main/resource/",
+    Env: "/mnt/main/env/"
 }
 
-export class ResultStatus {
-    public static readonly OK = "ok";
-    public static readonly NG = "ng";
-
-    public static get(b: boolean) {
-        return b ? this.OK : this.NG;
-    }
+export enum ResultStatus {
+    OK = "ok",
+    NG = "ng"
 }
 
 export class Option {

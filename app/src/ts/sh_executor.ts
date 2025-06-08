@@ -7,7 +7,7 @@ const SLEEP_INTERVAL = 0.5;
 export class Ticket {
     end: boolean = false;
     process: ChildProcess | null = null;
-    async wait() {
+    async wait(): Promise<void> {
         let timeoutFlag = false;
         const start = new Date().getTime();
         while (!this.end && !timeoutFlag) {
@@ -22,14 +22,11 @@ function sleep(sec: number) {
 }
 
 export function execSh(exeName: string, args: string[] = []): Ticket {
-    let tic = new Ticket();
-    let cb = (error: ExecException | null, stdout: string | Buffer, stderr: string | Buffer) => {
-        if (stdout)
-            console.log(stdout);
-        if (error)
-            throw error;
-        else if (stderr)
-            throw Error(stderr.toString());
+    const tic = new Ticket();
+    const cb = (error: ExecException | null, stdout: string | Buffer, stderr: string | Buffer) => {
+        if (stdout) console.log(stdout);
+        if (error) throw error;
+        else if (stderr) throw Error(stderr.toString());
         tic.end = true;
     };
     tic.process = exec(SH_DIR + exeName + ".sh " + args.join(" "), cb);
