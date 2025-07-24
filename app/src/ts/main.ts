@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import { BbtDef, isBbtDef, CmdDef } from "./def";
-import { execSh } from "./sh_executor";
+import { execSh } from "./sh-executor";
 import 'source-map-support/register';
 import { s_assertionType, s_pathSet, Option } from "./const";
 
@@ -52,10 +52,7 @@ function summarize(opes: CmdDef[]): boolean {
             };
         return null;
     }).filter(d => d != null);
-    const summary = {
-        result: errList.length == 0,
-        errList: errList
-    };
+    const summary = { result: errList.length === 0, errList };
     console.info(JSON.stringify(summary));
     return summary.result;
 }
